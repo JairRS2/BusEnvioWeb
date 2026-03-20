@@ -5,8 +5,8 @@ import { useState } from 'react';
 const tabs = [
   { id: 'home', label: 'Inicio', icon: Home },
   { id: 'quote', label: 'Cotizar', icon: Calculator },
-  { id: 'departures', label: 'Salidas', icon: Bus },
-  { id: 'account', label: 'Cuenta', icon: User },
+ // { id: 'departures', label: 'Salidas', icon: Bus },
+  //{ id: 'account', label: 'Cuenta', icon: User },
 ];
 
 interface BottomNavProps {

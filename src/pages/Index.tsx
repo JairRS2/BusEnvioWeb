@@ -5,6 +5,7 @@ import QuoterSection from '@/components/QuoterSection';
 import DeparturesSection from '@/components/DeparturesSection';
 import BottomNav from '@/components/BottomNav';
 
+
 const Index = () => {
   const [activeTab, setActiveTab] = useState('home');
 
@@ -15,14 +16,19 @@ const Index = () => {
       {activeTab === 'home' && (
         <>
           <TrackingSection />
-          <QuoterSection />
-          <DeparturesSection />
+
         </>
       )}
 
       {activeTab === 'quote' && (
         <>
           <QuoterSection />
+          <div className="px-4 pt-6 pb-28">
+          <div className="glass-card rounded-2xl p-8 text-center">
+            <p className="text-muted-foreground text-sm"></p>
+            <p className="text-xs text-muted-foreground mt-1"></p>
+          </div>
+        </div>
         </>
       )}
 

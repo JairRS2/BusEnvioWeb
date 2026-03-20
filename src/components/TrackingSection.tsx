@@ -46,7 +46,7 @@ const TrackingSection = () => {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Ej: ENV-2024-001"
+              placeholder="Ej: VER-402-001"
               value={guideNumber}
               onChange={e => setGuideNumber(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleSearch()}
@@ -59,7 +59,7 @@ const TrackingSection = () => {
         </div>
 
         <p className="text-xs text-muted-foreground mt-2">
-          Prueba: ENV-2024-001, ENV-2024-002, ENV-2024-003
+          Prueba: VER-402-001, VER-402-002, VER-402-003
         </p>
 
         <AnimatePresence mode="wait">

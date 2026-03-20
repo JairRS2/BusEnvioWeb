@@ -9,12 +9,6 @@ export interface TrackingData {
   lastUpdate: string;
 }
 
-export interface Route {
-  id: string;
-  origin: string;
-  destination: string;
-}
-
 export interface PackageCategory {
   id: string;
   name: string;
@@ -24,54 +18,62 @@ export interface PackageCategory {
 }
 
 export const stops = [
-  'Ciudad de México', 'Puebla', 'Oaxaca', 'Veracruz',
-  'Querétaro', 'Guadalajara', 'León', 'Morelia',
-  'Toluca', 'Cuernavaca', 'Pachuca', 'Tlaxcala',
+  'Orizaba',
+  'Fortín Pista',
+  'Monte Blanco',
+  'Chocamán',
+  'Coscomatepec',
+  'Huatusco',
+  'Córdoba',
+  'Paso Rayón',
+  'Tezonapa',
+  'Tierra Blanca',
+  'Xalapa',
 ];
 
 export const packageCategories: PackageCategory[] = [
-  { id: 'sobre', name: 'Sobre / Documento', icon: 'FileText', description: 'Hasta 500g', basePrice: 85 },
-  { id: 'caja_chica', name: 'Caja Chica', icon: 'Package', description: 'Hasta 5kg, 30×30×30cm', basePrice: 150 },
-  { id: 'caja_grande', name: 'Caja Grande', icon: 'Box', description: 'Hasta 25kg, 60×60×60cm', basePrice: 280 },
-  { id: 'especial', name: 'Equipaje Especial', icon: 'Luggage', description: 'Más de 25kg o irregular', basePrice: 450 },
+  { id: 'sobre', name: 'Sobre / Documento', icon: 'FileText', description: 'Hasta 500g (Ideal para tablero)', basePrice: 60 },
+  { id: 'caja_chica', name: 'Caja Chica', icon: 'Package', description: 'Hasta 5kg (Cajuela)', basePrice: 100 },
+  { id: 'caja_grande', name: 'Caja Grande', icon: 'Box', description: 'Hasta 25kg (Cajuela)', basePrice: 180 },
+  { id: 'especial', name: 'Equipaje Especial', icon: 'Luggage', description: 'Bultos agrícolas o mudanza', basePrice: 350 },
 ];
 
 export const mockTracking: Record<string, TrackingData> = {
-  'ENV-2024-001': {
-    guideNumber: 'ENV-2024-001',
+  'VER-402-001': {
+    guideNumber: 'VER-402-001',
     status: 'en_camino',
-    origin: 'Ciudad de México',
-    destination: 'Puebla',
-    location: 'cajuela',
-    category: 'Caja Chica',
-    estimatedArrival: '14:30',
-    lastUpdate: 'Hace 25 min',
-  },
-  'ENV-2024-002': {
-    guideNumber: 'ENV-2024-002',
-    status: 'en_terminal',
-    origin: 'Guadalajara',
-    destination: 'Querétaro',
+    origin: 'Huatusco',
+    destination: 'Córdoba',
     location: 'tablero',
     category: 'Sobre / Documento',
-    estimatedArrival: '16:00',
-    lastUpdate: 'Hace 10 min',
+    estimatedArrival: '15:45',
+    lastUpdate: 'Pasando por Chocamán',
   },
-  'ENV-2024-003': {
-    guideNumber: 'ENV-2024-003',
-    status: 'entregado',
-    origin: 'Oaxaca',
-    destination: 'Veracruz',
+  'VER-402-002': {
+    guideNumber: 'VER-402-002',
+    status: 'en_terminal',
+    origin: 'Orizaba',
+    destination: 'Tezonapa',
     location: 'cajuela',
     category: 'Caja Grande',
+    estimatedArrival: '17:20',
+    lastUpdate: 'En Terminal Tezonapa',
+  },
+  'VER-402-003': {
+    guideNumber: 'VER-402-003',
+    status: 'entregado',
+    origin: 'Tierra Blanca',
+    destination: 'Fortín Pista',
+    location: 'cajuela',
+    category: 'Caja Chica',
     estimatedArrival: 'Entregado',
-    lastUpdate: 'Hace 2 hrs',
+    lastUpdate: 'Hace 1 hr', 
   },
 };
 
 export const nextDepartures = [
-  { time: '10:30', route: 'CDMX → Puebla', available: true },
-  { time: '11:00', route: 'CDMX → Querétaro', available: true },
-  { time: '12:15', route: 'CDMX → Oaxaca', available: false },
-  { time: '13:00', route: 'CDMX → Guadalajara', available: true },
+  { time: '14:30', route: 'Orizaba → Córdoba → Tezonapa', available: true },
+  { time: '15:00', route: 'Huatusco → Coscomatepec → Córdoba', available: true },
+  { time: '16:15', route: 'Córdoba → Paso Rayón → Tierra Blanca', available: false },
+  { time: '17:00', route: 'Fortín Pista → Orizaba', available: true },
 ];

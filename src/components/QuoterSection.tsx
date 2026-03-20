@@ -131,6 +131,7 @@ const QuoterSection = () => {
         </AnimatePresence>
       </motion.div>
     </section>
+    
   );
 };
 
