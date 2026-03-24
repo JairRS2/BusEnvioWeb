@@ -1,12 +1,12 @@
 export interface TrackingData {
-  guideNumber: string;
-  status: 'recibido' | 'en_camino' | 'en_terminal' | 'entregado';
-  origin: string;
-  destination: string;
-  location: 'cajuela' | 'tablero';
-  category: string;
-  estimatedArrival: string;
-  lastUpdate: string;
+  numeroGuia: string;
+  estado: 'recibido' | 'en_camino' | 'en_terminal' | 'entregado';
+  origen: string;
+  destino: string;
+  ubicacion: string; 
+  categoria: string;
+  llegadaEstimada: string;
+  ultimaActualizacion: string;
 }
 
 export interface PackageCategory {
@@ -40,34 +40,34 @@ export const packageCategories: PackageCategory[] = [
 
 export const mockTracking: Record<string, TrackingData> = {
   'VER-402-001': {
-    guideNumber: 'VER-402-001',
-    status: 'en_camino',
-    origin: 'Huatusco',
-    destination: 'Córdoba',
-    location: 'tablero',
-    category: 'Sobre / Documento',
-    estimatedArrival: '15:45',
-    lastUpdate: 'Pasando por Chocamán',
+    numeroGuia: 'VER-402-001',
+    estado: 'en_camino',
+    origen: 'Huatusco',
+    destino: 'Córdoba',
+    ubicacion: 'tablero',
+    categoria: 'Sobre / Documento',
+    llegadaEstimada: '15:45',
+    ultimaActualizacion: 'Pasando por Chocamán',
   },
   'VER-402-002': {
-    guideNumber: 'VER-402-002',
-    status: 'en_terminal',
-    origin: 'Orizaba',
-    destination: 'Tezonapa',
-    location: 'cajuela',
-    category: 'Caja Grande',
-    estimatedArrival: '17:20',
-    lastUpdate: 'En Terminal Tezonapa',
+    numeroGuia: 'VER-402-002',
+    estado: 'en_terminal',
+    origen: 'Orizaba',
+    destino: 'Tezonapa',
+    ubicacion: 'cajuela',
+    categoria: 'Caja Grande',
+    llegadaEstimada: '17:20',
+    ultimaActualizacion: 'En Terminal Tezonapa',
   },
   'VER-402-003': {
-    guideNumber: 'VER-402-003',
-    status: 'entregado',
-    origin: 'Tierra Blanca',
-    destination: 'Fortín Pista',
-    location: 'cajuela',
-    category: 'Caja Chica',
-    estimatedArrival: 'Entregado',
-    lastUpdate: 'Hace 1 hr', 
+    numeroGuia: 'VER-402-003',
+    estado: 'entregado',
+    origen: 'Tierra Blanca',
+    destino: 'Fortín Pista',
+    ubicacion: 'cajuela',
+    categoria: 'Caja Chica',
+    llegadaEstimada: 'Entregado',
+    ultimaActualizacion: 'Hace 1 hr', 
   },
 };
 

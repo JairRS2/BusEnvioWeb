@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Package, MapPin, Clock, Truck, CheckCircle2, FileText, Box, Luggage } from 'lucide-react';
+import { Search, Package, MapPin, Clock, Truck, CheckCircle2, FileText, Box } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { mockTracking, type TrackingData } from '@/data/mockData';
+import { HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
+import { type TrackingData, mockTracking } from '@/data/mockData';
 
 const statusSteps = [
   { key: 'recibido', label: 'Recibido', icon: Package },
@@ -18,19 +19,77 @@ const TrackingSection = () => {
   const [guideNumber, setGuideNumber] = useState('');
   const [tracking, setTracking] = useState<TrackingData | null>(null);
   const [notFound, setNotFound] = useState(false);
+  const [connection, setConnection] = useState<HubConnection | null>(null);
+  const [isSearching, setIsSearching] = useState(false);
 
-  const handleSearch = () => {
+  useEffect(() => {
+    const newConnection = new HubConnectionBuilder()
+      .withUrl("http://pruebasdesarrollo.ddns.net:3005/trackingHub") 
+      .configureLogging(LogLevel.Information)
+      .withAutomaticReconnect()
+      .build();
+
+    setConnection(newConnection);
+  }, []);
+
+  useEffect(() => {
+    if (connection) {
+      connection.start()
+        .then(() => {
+          console.log('¡Conectado a SignalR exitosamente!');
+          
+          connection.on('RecibirInfoRastreo', (data: TrackingData) => {
+             setTracking(data);
+             setNotFound(false);
+             setIsSearching(false);
+          });
+
+          connection.on('RastreoNoEncontrado', () => {
+            setTracking(null);
+            setNotFound(true);
+            setIsSearching(false);
+          });
+        })
+        .catch(e => console.error('Error conectando a SignalR:', e));
+    }
+
+    return () => {
+      if (connection) {
+        connection.off('RecibirInfoRastreo');
+        connection.off('RastreoNoEncontrado');
+      }
+    };
+  }, [connection]);
+
+  const handleSearch = useCallback(async () => {
     const trimmed = guideNumber.trim().toUpperCase();
-    if (mockTracking[trimmed]) {
-      setTracking(mockTracking[trimmed]);
+    if (!trimmed) return;
+
+    if (mockTracking[trimmed] && (!connection || connection.state !== 'Connected')) {
+        setTracking(mockTracking[trimmed]);
+        setNotFound(false);
+        return;
+    }
+
+    if (connection && connection.state === 'Connected') {
+      setIsSearching(true);
       setNotFound(false);
+      try {
+        await connection.invoke('SolicitarInfoRastreo', trimmed);
+      } catch (error) {
+        console.error('Error al solicitar info:', error);
+        setIsSearching(false);
+      }
     } else {
+      console.warn('SignalR no está conectado.');
       setTracking(null);
       setNotFound(true);
     }
-  };
+  }, [guideNumber, connection]);
 
-  const currentStep = tracking ? statusIndex(tracking.status) : -1;
+  // Cálculo seguro extraído fuera del HTML para evitar errores de renderizado
+  const currentStep = tracking && tracking.estado ? statusIndex(tracking.estado) : -1;
+  const progressWidth = currentStep >= 0 ? (currentStep / (statusSteps.length - 1)) * (100 - 12) : 0;
 
   return (
     <section className="px-4 pt-6">
@@ -51,15 +110,20 @@ const TrackingSection = () => {
               onChange={e => setGuideNumber(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleSearch()}
               className="pl-10 bg-muted/50 border-border/50 h-11 rounded-xl text-sm"
+              disabled={isSearching}
             />
           </div>
-          <Button onClick={handleSearch} className="gradient-primary text-primary-foreground h-11 px-5 rounded-xl font-semibold shadow-md">
-            Buscar
+          <Button 
+            onClick={handleSearch} 
+            disabled={isSearching}
+            className="gradient-primary text-primary-foreground h-11 px-5 rounded-xl font-semibold shadow-md"
+          >
+            {isSearching ? 'Buscando...' : 'Buscar'}
           </Button>
         </div>
 
         <p className="text-xs text-muted-foreground mt-2">
-          Prueba: VER-402-001, VER-402-002, VER-402-003
+           Ingresa tú número de guía para saber el estado actual de tu envío.
         </p>
 
         <AnimatePresence mode="wait">
@@ -75,7 +139,7 @@ const TrackingSection = () => {
             </motion.div>
           )}
 
-          {tracking && (
+          {tracking && !notFound && (
             <motion.div
               key="result"
               initial={{ opacity: 0, height: 0 }}
@@ -85,11 +149,10 @@ const TrackingSection = () => {
             >
               {/* Status Timeline */}
               <div className="flex items-center justify-between mb-5 relative">
-                {/* Progress line */}
                 <div className="absolute top-4 left-6 right-6 h-0.5 bg-border" />
                 <div
                   className="absolute top-4 left-6 h-0.5 gradient-primary transition-all duration-700"
-                  style={{ width: `${(currentStep / (statusSteps.length - 1)) * (100 - 12)}%` }}
+                  style={{ width: `${progressWidth}%` }}
                 />
 
                 {statusSteps.map((step, i) => {
@@ -120,34 +183,32 @@ const TrackingSection = () => {
               <div className="grid grid-cols-2 gap-2">
                 <div className="bg-muted/50 rounded-xl p-3">
                   <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Origen</p>
-                  <p className="text-sm font-semibold text-foreground mt-0.5">{tracking.origin}</p>
+                  <p className="text-sm font-semibold text-foreground mt-0.5">{tracking.origen}</p>
                 </div>
                 <div className="bg-muted/50 rounded-xl p-3">
                   <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Destino</p>
-                  <p className="text-sm font-semibold text-foreground mt-0.5">{tracking.destination}</p>
+                  <p className="text-sm font-semibold text-foreground mt-0.5">{tracking.destino}</p>
+                  
                 </div>
-                <div className="bg-muted/50 rounded-xl p-3">
-                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Ubicación</p>
+                 <div className="bg-muted/50 rounded-xl p-3">
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Unidad</p>
                   <div className="flex items-center gap-1.5 mt-0.5">
-                    {tracking.location === 'cajuela' ? (
-                      <Box className="h-3.5 w-3.5 text-primary" />
-                    ) : (
-                      <FileText className="h-3.5 w-3.5 text-accent" />
-                    )}
-                    <span className="text-sm font-semibold text-foreground capitalize">{tracking.location}</span>
+                    <Truck className="h-3.5 w-3.5 text-primary" />
+                    <span className="text-sm font-semibold text-foreground capitalize">{tracking.ubicacion}</span>
                   </div>
                 </div>
+
                 <div className="bg-muted/50 rounded-xl p-3">
                   <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Llegada Est.</p>
                   <div className="flex items-center gap-1.5 mt-0.5">
                     <Clock className="h-3.5 w-3.5 text-success" />
-                    <span className="text-sm font-semibold text-foreground">{tracking.estimatedArrival}</span>
+                    <span className="text-sm font-semibold text-foreground">{tracking.llegadaEstimada}</span>
                   </div>
                 </div>
               </div>
 
               <p className="text-[10px] text-muted-foreground text-center mt-3">
-                Última actualización: {tracking.lastUpdate}
+                Última actualización: {tracking.ultimaActualizacion}
               </p>
             </motion.div>
           )}
